@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    // Base recommended options
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "target": "es2024",
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    // Strict type checking
+    "strict": true,
+    "noImplicitOverride": true,
+    "allowUnreachableCode": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    // Transpile
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    // Emit
+    "declaration": true,
+    "lib": ["es2024"]
+  },
+  "include": ["data", "server", "versions"],
+  "exclude": ["dist", "node_modules"]
+}
