@@ -6,31 +6,31 @@ export type Category = (typeof CATEGORIES)[number]
 type AspectImportances = Record<TrustAspect, number>
 
 const CATEGORY_CALCULATION: AspectImportances = {
-  Accuracy: 9.7,
-  Consistency: 9.7,
-  Explainability: 8.5,
-  Fairness: 3.6,
+  Accuracy: 9.3,
+  Consistency: 9.3,
+  Explainability: 7.2,
+  Fairness: 0.9,
 }
 
 const CATEGORY_OPINION: AspectImportances = {
-  Accuracy: 5.3,
-  Consistency: 9.1,
-  Explainability: 7.7,
-  Fairness: 8.2,
+  Accuracy: 2.1,
+  Consistency: 7.8,
+  Explainability: 5.1,
+  Fairness: 6.6,
 }
 
 const CATEGORY_INFORMATIONAL: AspectImportances = {
-  Accuracy: 8.6,
-  Consistency: 8.8,
-  Explainability: 8.3,
-  Fairness: 8.1,
+  Accuracy: 7.2,
+  Consistency: 7.7,
+  Explainability: 6.7,
+  Fairness: 5.5,
 }
 
 const CATEGORY_ADVICE: AspectImportances = {
-  Accuracy: 8.5,
-  Consistency: 9.1,
-  Explainability: 7.8,
-  Fairness: 6.3,
+  Accuracy: 6.8,
+  Consistency: 8.1,
+  Explainability: 5.7,
+  Fairness: 3.3,
 }
 
 const ALL_CATEGORIES = [CATEGORY_CALCULATION, CATEGORY_OPINION, CATEGORY_INFORMATIONAL, CATEGORY_ADVICE]
