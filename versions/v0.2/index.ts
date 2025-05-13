@@ -6,28 +6,35 @@ import { trustScorePromptWithStats } from '../shared/algorithms.js'
 
 export async function trust(ai: AIInterface, model: Model, prompt: string, response: string) {
   const category = await ai.queryQuestionCategory(prompt)
+  if (!category.success) return category
 
-  const groupings = await Promise.all(
+  const encounters = await Promise.all(
     LIMITATIONS.map((limitation) =>
       ai
         .queryLimitationEncountered(limitation.name, prompt, response)
-        .then((encountered) => ({ aspect: limitation.aspect, encountered })),
+        .then((result) => ({ aspect: limitation.aspect, result })),
     ),
   )
 
-  const encountered = TRUST_ASPECTS.map((aspect) =>
-    groupings.filter((limitation) => limitation.aspect === aspect).map((limitation) => limitation.encountered),
-  )
+  const encountered = TRUST_ASPECTS.map(() => [] as boolean[])
+
+  for (const { aspect, result } of encounters) {
+    if (!result.success) return result
+    encountered[TRUST_ASPECTS.indexOf(aspect)].push(result.result)
+  }
 
   return {
-    category,
-    ...trustScorePromptWithStats(
-      CATEGORY_IMPORTANCES[category],
-      MODEL_PARAMETERS[model].limitations,
-      MODEL_PARAMETERS[model].occurrence,
-      MODEL_PARAMETERS[model].criticality,
-      MODEL_PARAMETERS[model].detection,
-      encountered,
-    ),
+    success: true as const,
+    result: {
+      category,
+      ...trustScorePromptWithStats(
+        CATEGORY_IMPORTANCES[category.result],
+        MODEL_PARAMETERS[model].limitations,
+        MODEL_PARAMETERS[model].occurrence,
+        MODEL_PARAMETERS[model].criticality,
+        MODEL_PARAMETERS[model].detection,
+        encountered,
+      ),
+    },
   }
 }

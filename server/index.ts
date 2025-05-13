@@ -38,13 +38,13 @@ app.post('/', async (req, res) => {
   const ai =
     data.ai.type === 'chatgpt'
       ? new ChatGPTInterface(data.ai.token, data.ai.model)
-      : new OllamaInterface(data.ai.url, data.ai.model)
+      : new OllamaInterface(data.ai.url, data.ai.headers || {}, data.ai.model)
 
   const queryVersions = [...new Set(data.versions)]
   const promises = queryVersions.map((version) => async () => {
     const start = Date.now()
     const output = await versions[version](ai!, data.model, data.prompt, data.response)
-    return { version, output, duration: Date.now() - start }
+    return { version, duration: Date.now() - start, ...output }
   })
 
   const outputs = await Promise.all(promises.map((promise) => promise()))

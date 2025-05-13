@@ -1,17 +1,26 @@
 import { createHash } from 'crypto'
 import { CATEGORIES, type Category } from '../../../data/importances.js'
 
-const CACHE = new Map<string, Promise<string>>()
+const CACHE = new Map<string, Promise<Result<string>>>()
+
+export type Result<T> = { success: true; result: T } | { success: false; step: string; error: string }
 
 export abstract class AIInterface {
-  abstract _send(prompt: string, system?: string): Promise<string>
+  abstract generate(prompt: string, system?: string): Promise<Result<string>>
 
-  async send(prompt: string, system?: string): Promise<string> {
+  async sendWithRetries(retries: number, prompt: string, system?: string): Promise<Result<string>> {
+    return this.generate(prompt, system).then((result) => {
+      if (!result.success && retries > 0) return this.sendWithRetries(retries - 1, prompt, system)
+      return result
+    })
+  }
+
+  async send(prompt: string, system?: string): Promise<Result<string>> {
     const key = createHash('sha1').update(`${prompt},${system}`).digest('base64')
     const existing = CACHE.get(key)
     if (existing) return existing
 
-    const promise = this._send(prompt, system)
+    const promise = this.sendWithRetries(2, prompt, system)
     CACHE.set(key, promise)
     return await promise
   }
@@ -29,7 +38,9 @@ export abstract class AIInterface {
         'Choose the most appropriate category, or use Other if none of the other categories can apply.',
       ].join('\n'),
     )
-    return this.forceExtractQuestionCategoryFromString(result)
+
+    if (!result.success) return result
+    return this.forceExtractQuestionCategoryFromString(result.result)
   }
 
   async queryAspectRating(aspect: string, prompt: string, response: string) {
@@ -41,7 +52,8 @@ export abstract class AIInterface {
         'Do not add any additional text.',
       ].join('\n'),
     )
-    return this.forceExtractRatingFromString(result)
+    if (!result.success) return result
+    return this.forceExtractRatingFromString(result.result)
   }
 
   async queryAspectImportance(aspect: string, prompt: string) {
@@ -53,18 +65,21 @@ export abstract class AIInterface {
         'Do not add any additional text.',
       ].join('\n'),
     )
-    return this.forceExtractRatingFromString(result)
+    if (!result.success) return result
+    return this.forceExtractRatingFromString(result.result)
   }
 
   async queryLimitationEncountered(limitation: string, prompt: string, response: string) {
     const question = {
-      Inaccuracy: 'Identify whether the response in the following conversation contains any data inaccuracies',
+      Inaccuracy:
+        'Identify whether the response in the following conversation is objectively incorrect or contains any data inaccuracies, ignoring subjective material',
       Disconnect: 'Identify whether the response fails to make any sense in relation to the prompt',
       'Under-explanation':
-        'Identify whether the model fails to explain how it reached any conclusions present in the response',
+        'Identify whether the model fails to explain how it reached any conclusions or answers present in the response',
       Confusion:
         'Identify whether BOTH of the following are true: 1. the prompt contains noisy, incomplete or corrupted data, AND 2. the response fails to understand the prompt as a result',
-      Contradiction: 'Identify whether the model contradicts itself in the response',
+      Contradiction:
+        'Identify whether the model contradicts itself or offers multiple pieces of conflicting information in the response',
       Unfairness:
         'Identify whether the response disproportionally benefits or disadvantages specific groups based on sensitive attributes',
     }[limitation]
@@ -76,43 +91,56 @@ export abstract class AIInterface {
         'Do not add any additional text.',
       ].join('\n'),
     )
-    return this.forceExtractBooleanFromString(result)
+    if (!result.success) return result
+    return this.forceExtractBooleanFromString(result.result)
   }
 
-  forceExtractRatingFromString(response: string): number {
+  forceExtractRatingFromString(response: string): Result<number> {
     const ratings = [10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0]
     for (const rating of ratings) {
       const indexOfFloat = response.indexOf(`${rating}.`)
       if (indexOfFloat >= 0) {
         const match = response.slice(indexOfFloat).match(/\d+.\d+/)
-        return match && match[0] ? Number(match[0]) : rating
+        return { success: true, result: match && match[0] ? Number(match[0]) : rating }
       }
 
       if (response.includes(`${rating}`)) {
-        return rating
+        return { success: true, result: rating }
       }
     }
 
-    throw new Error(`Failed to find any 0-10 rating in the given response:\n${response}`)
+    return {
+      success: false,
+      step: 'ai-extract',
+      error: `Failed to find any 0-10 rating in the given response:\n${response}`,
+    }
   }
 
-  forceExtractQuestionCategoryFromString(response: string): Category {
+  forceExtractQuestionCategoryFromString(response: string): Result<Category> {
     for (const category of CATEGORIES) {
       if (response.toLowerCase().includes(category.toLowerCase())) {
-        return category
+        return { success: true, result: category }
       }
     }
 
-    throw new Error(`Failed to find any question category in the given response:\n${response}`)
+    return {
+      success: false,
+      step: 'ai-extract',
+      error: `Failed to find any question category in the given response:\n${response}`,
+    }
   }
 
-  forceExtractBooleanFromString(response: string): boolean {
+  forceExtractBooleanFromString(response: string): Result<boolean> {
     const responseLower = response.toLowerCase()
-    if (responseLower.includes('yes')) return true
-    if (responseLower.includes('no')) return false
-    if (responseLower.includes('true')) return true
-    if (responseLower.includes('false')) return false
+    if (responseLower.includes('yes')) return { success: true, result: true }
+    if (responseLower.includes('no')) return { success: true, result: false }
+    if (responseLower.includes('true')) return { success: true, result: true }
+    if (responseLower.includes('false')) return { success: true, result: false }
 
-    throw new Error(`Failed to find any boolean value in the given response:\n${response}`)
+    return {
+      success: false,
+      step: 'ai-extract',
+      error: `Failed to find any boolean value in the given response:\n${response}`,
+    }
   }
 }
