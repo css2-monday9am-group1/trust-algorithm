@@ -6,9 +6,7 @@
   "scripts": {
     "build": "tsc ."
   },
-  "keywords": [],
   "author": "",
-  "license": "MIT",
   "packageManager": "pnpm@10.9.0",
   "dependencies": {
     "body-parser": "^2.2.0",
