@@ -1,6 +1,6 @@
 import { MODELS, TRUST_ASPECTS, type Model, type TrustAspect } from './general.js'
 
-const BASELINE_DETECTION = 9
+const BASELINE_DETECTION = 9.9
 
 interface TrustAspectLimitation {
   name: string
