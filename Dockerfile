@@ -10,9 +10,9 @@ COPY pnpm-lock.yaml .
 RUN pnpm install --frozen-lockfile
 
 # Copy everything else
-COPY data .
-COPY server .
-COPY versions .
+COPY data ./data
+COPY server ./server
+COPY versions ./versions
 
 # Run
 CMD ["bun", "run", "server/index.ts"]
