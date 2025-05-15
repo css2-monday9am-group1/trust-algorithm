@@ -22,7 +22,9 @@ export abstract class AIInterface {
 
     const promise = this.sendWithRetries(2, prompt, system)
     CACHE.set(key, promise)
-    return await promise
+    const result = await promise
+    if (!result.success) setImmediate(() => CACHE.delete(key))
+    return result
   }
 
   static BASE_SYSTEM =
@@ -73,13 +75,13 @@ export abstract class AIInterface {
     const question = {
       Inaccuracy:
         'Identify whether the response in the following conversation is objectively incorrect or contains any data inaccuracies, ignoring subjective material',
-      Disconnect: 'Identify whether the response fails to make any sense in relation to the prompt',
+      Disconnect: 'Identify whether the response appears to be completely disconnected from the original prompt',
       'Under-explanation':
         'Identify whether the model fails to explain how it reached any conclusions or answers present in the response',
       Confusion:
         'Identify whether BOTH of the following are true: 1. the prompt contains noisy, incomplete or corrupted data, AND 2. the response fails to understand the prompt as a result',
       Contradiction:
-        'Identify whether the model contradicts itself or offers multiple pieces of conflicting information in the response',
+        'Identify whether the response contradicts itself by proving conflicting pieces of information in the same response',
       Unfairness:
         'Identify whether the response disproportionally benefits or disadvantages specific groups based on sensitive attributes',
     }[limitation]

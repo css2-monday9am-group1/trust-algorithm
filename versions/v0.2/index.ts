@@ -26,7 +26,7 @@ export async function trust(ai: AIInterface, model: Model, prompt: string, respo
   return {
     success: true as const,
     result: {
-      category,
+      category: category.result,
       ...trustScorePromptWithStats(
         CATEGORY_IMPORTANCES[category.result],
         MODEL_PARAMETERS[model].limitations,

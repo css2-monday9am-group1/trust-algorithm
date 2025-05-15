@@ -1,7 +1,8 @@
+import type { Model } from '../../data/general.js'
 import { AIInterface } from '../shared/ai/base.js'
 import { trustScorePromptWithStats } from '../shared/algorithms.js'
 
-export async function trust(ai: AIInterface, prompt: string, response: string) {
+export async function trust(ai: AIInterface, _model: Model, prompt: string, response: string) {
   const aspects = ['Accuracy', 'Explainability', 'Consistency', 'Fairness']
 
   const importanceResults = await Promise.all(aspects.map((aspect) => ai.queryAspectImportance(aspect, prompt)))
