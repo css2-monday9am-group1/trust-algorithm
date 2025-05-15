@@ -24,7 +24,7 @@ interface TrustAspectLimitationParameters {
 export const LIMITATIONS: TrustAspectLimitation[] = [
   {
     name: 'Inaccuracy',
-    description: "The modal's response includes data inaccuracies",
+    description: "The model's response is incorrect or includes data inaccuracies.",
     aspect: 'Accuracy',
     parameters_baseline: {
       occurrence: 7.8,
@@ -34,7 +34,7 @@ export const LIMITATIONS: TrustAspectLimitation[] = [
   },
   {
     name: 'Disconnect',
-    description: "The model's response does not make sense in connection with the user prompt",
+    description: "The model's response does not make sense in connection to the user's prompt.",
     aspect: 'Explainability',
     parameters_baseline: {
       occurrence: 9.5,
@@ -44,7 +44,7 @@ export const LIMITATIONS: TrustAspectLimitation[] = [
   },
   {
     name: 'Under-explanation',
-    description: 'The model fails to explain how it reached its conclusion',
+    description: 'The model fails to explain how it reached its conclusion.',
     aspect: 'Explainability',
     parameters_baseline: {
       occurrence: 6.6,
@@ -54,7 +54,7 @@ export const LIMITATIONS: TrustAspectLimitation[] = [
   },
   {
     name: 'Confusion',
-    description: 'The model fails to understand the prompt due to noisy, incomplete or corrupted data',
+    description: 'The model fails to understand the prompt due to noisy, incomplete or corrupted data.',
     aspect: 'Consistency',
     parameters_baseline: {
       occurrence: 8.1,
@@ -64,7 +64,7 @@ export const LIMITATIONS: TrustAspectLimitation[] = [
   },
   {
     name: 'Contradiction',
-    description: "The model's response includes contradictions",
+    description: "The model's response includes contradictions against itself.",
     aspect: 'Consistency',
     parameters_baseline: {
       occurrence: 9.9,
@@ -75,7 +75,7 @@ export const LIMITATIONS: TrustAspectLimitation[] = [
   {
     name: 'Unfairness',
     description:
-      "The model's response disproportionally benefits or disadvantages specific groups based on sensitive attributes",
+      "The model's response disproportionally benefits or disadvantages specific groups based on sensitive attributes.",
     aspect: 'Fairness',
     parameters_baseline: {
       occurrence: 9.9,
