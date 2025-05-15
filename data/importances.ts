@@ -7,29 +7,29 @@ type AspectImportances = Record<TrustAspect, number>
 
 const CATEGORY_CALCULATION: AspectImportances = {
   Accuracy: 9.3,
-  Consistency: 9.3,
-  Explainability: 7.2,
-  Fairness: 0.9,
+  Consistency: 7.8,
+  Explainability: 8.0,
+  Fairness: 1.7,
 }
 
 const CATEGORY_OPINION: AspectImportances = {
-  Accuracy: 2.1,
-  Consistency: 7.8,
-  Explainability: 5.1,
-  Fairness: 6.6,
+  Accuracy: 2.3,
+  Consistency: 2.5,
+  Explainability: 6.3,
+  Fairness: 5.2,
 }
 
 const CATEGORY_INFORMATIONAL: AspectImportances = {
-  Accuracy: 7.2,
-  Consistency: 7.7,
-  Explainability: 6.7,
-  Fairness: 5.5,
+  Accuracy: 5.6,
+  Consistency: 5.5,
+  Explainability: 7.3,
+  Fairness: 4.4,
 }
 
 const CATEGORY_ADVICE: AspectImportances = {
-  Accuracy: 6.8,
-  Consistency: 8.1,
-  Explainability: 5.7,
+  Accuracy: 6.3,
+  Consistency: 4.9,
+  Explainability: 7.3,
   Fairness: 3.3,
 }
 
